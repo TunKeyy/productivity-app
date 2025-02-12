@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "owner": "ntkha71",
+    "name": "Expo Router Typescript",
+    "slug": "expo-router-typescript",
+    "scheme": "productivity",
+    "version": "1.0.0",
+    "platforms": ["ios", "android"],
+    "orientation": "portrait",
+    "icon": "./assets/app-icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#222"
+    },
+    "experiments": {
+      "reactServerFunctions": false,
+      "tsconfigPaths": true
+    },
+    "assetBundlePatterns": ["assets/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ntkha71.productivity"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/app-icon.png",
+        "backgroundColor": "#222"
+      },
+      "package": "com.ntkha71.productivity"
+    },
+    "web": {
+      "favicon": "./assets/app-icon.png",
+      "output": "static",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
