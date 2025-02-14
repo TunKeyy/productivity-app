@@ -5,7 +5,7 @@
     "slug": "expo-router-typescript",
     "scheme": "productivity",
     "version": "1.0.0",
-    "platforms": ["ios", "android"],
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "automatic",
@@ -37,6 +37,9 @@
     },
     "plugins": [
       "expo-router",
+      {
+        "debugger": false
+      },
       "expo-font"
     ],
     "extra": {

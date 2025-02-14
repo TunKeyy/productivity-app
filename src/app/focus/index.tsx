@@ -4,18 +4,23 @@ import {
   StyleSheet, 
   Text, 
   TouchableOpacity,
-  SafeAreaView,
-  StatusBar
+  StatusBar,
+  Platform
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useKeepAwake } from 'expo-keep-awake';
-import { colors, typography } from '@/constants/theme';
-import { Button } from '@/components/common/Button';
+import { typography } from '@/constants/theme';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const FOCUS_DURATION = 15 * 60; // 15 minutes in seconds
 
 export default function FocusScreen() {
-  useKeepAwake();
+  const { colors, theme } = useTheme();
+  // Only use keep-awake on native platforms
+  if (Platform.OS !== 'web') {
+    useKeepAwake();
+  }
+
   const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION);
   const [isActive, setIsActive] = useState(false);
 
@@ -48,46 +53,54 @@ export default function FocusScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <View style={[styles.container, { backgroundColor: colors.background.default }]}>
+      <StatusBar barStyle={theme === 'dark' ? "light-content" : "dark-content"} />
       <View style={styles.header}>
-        <Text style={styles.title}>15 min activity</Text>
-        <Text style={styles.timeRange}>5:30PM → 5:45PM</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Focus Timer</Text>
+        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+          Stay focused and productive
+        </Text>
       </View>
 
       <View style={styles.timerContainer}>
-        <View style={styles.progressRing}>
-          <Text style={styles.timerText}>{formatTimeLeft()}</Text>
+        <View style={[styles.progressRing, { 
+          borderColor: colors.accent,
+          backgroundColor: colors.background.default 
+        }]}>
+          <Text style={[styles.timerText, { color: colors.text.primary }]}>
+            {formatTimeLeft()}
+          </Text>
         </View>
       </View>
 
       <View style={styles.controls}>
         <TouchableOpacity 
-          style={styles.addButton}
+          style={[styles.addButton, { backgroundColor: colors.background.secondary }]}
           onPress={handleAddMinute}
         >
-          <Text style={styles.addButtonText}>+1 min</Text>
+          <Text style={[styles.addButtonText, { color: colors.text.primary }]}>
+            +1 min
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.playButton}
+          style={[styles.playButton, { backgroundColor: colors.background.secondary }]}
           onPress={() => setIsActive(!isActive)}
         >
           <MaterialIcons 
             name={isActive ? "pause" : "play-arrow"} 
             size={32} 
-            color="#000000" 
+            color={colors.text.primary} 
           />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
   },
   header: {
     paddingHorizontal: 20,
@@ -97,12 +110,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.xl,
     fontWeight: '600',
-    color: colors.text.primary,
     marginBottom: 4,
   },
-  timeRange: {
+  subtitle: {
     fontSize: typography.fontSize.md,
-    color: colors.text.secondary,
   },
   timerContainer: {
     flex: 1,
@@ -114,15 +125,12 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 150,
     borderWidth: 20,
-    borderColor: '#FFB5BA',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background.default,
   },
   timerText: {
     fontSize: 48,
     fontWeight: '600',
-    color: colors.text.primary,
   },
   controls: {
     flexDirection: 'row',
@@ -135,18 +143,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: colors.background.secondary,
   },
   addButtonText: {
     fontSize: typography.fontSize.md,
-    color: colors.text.primary,
     fontWeight: '500',
   },
   playButton: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
   },

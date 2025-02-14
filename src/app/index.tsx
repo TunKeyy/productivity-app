@@ -3,5 +3,11 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function Index() {
   const { session } = useAuth();
-  return <Redirect href={session ? "/(tabs)/home" : "/(auth)/login"} />;
+  
+  // Immediately redirect based on auth state
+  if (session) {
+    console.log('session', session);
+    return <Redirect href="/home" />;
+  }
+  return <Redirect href="/(auth)/login" />;
 } 

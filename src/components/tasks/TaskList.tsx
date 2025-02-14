@@ -12,21 +12,25 @@ import { useTasks } from '@/hooks/useTasks';
 import { colors, typography, spacing } from '@/constants/theme';
 import { formatDate } from '@/utils/date';
 import { Task } from '@/types/database';
+import { useTheme } from '@/providers/ThemeProvider';
 
 export function TaskList() {
   const { tasks, toggleTask } = useTasks();
+  const { colors, theme } = useTheme();
   const incompleteTasks = tasks.filter((task: Task) => !task.completed);
 
   if (incompleteTasks.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.background.secondary }]}>
         <MaterialIcons 
           name="check-circle" 
           size={48} 
           color={colors.secondary} 
         />
-        <Text style={styles.emptyText}>All caught up!</Text>
-        <Text style={styles.emptySubtext}>
+        <Text style={[styles.emptyText, { color: colors.text.primary }]}>
+          All caught up!
+        </Text>
+        <Text style={[styles.emptySubtext, { color: colors.text.secondary }]}>
           Time to add more tasks to stay productive
         </Text>
       </View>
@@ -34,11 +38,17 @@ export function TaskList() {
   }
 
   return (
-    <View style={styles.container}>
-      {incompleteTasks.map(task => (
+    <View style={[styles.container, { backgroundColor: colors.background.default }]}>
+      {incompleteTasks.map((task: Task) => (
         <TouchableOpacity
           key={task.id}
-          style={styles.taskItem}
+          style={[
+            styles.taskItem,
+            { 
+              backgroundColor: colors.background.secondary,
+              borderColor: colors.border,
+            }
+          ]}
           onPress={() => router.push(`/home/task/${task.id}`)}
         >
           <TouchableOpacity 
@@ -56,32 +66,33 @@ export function TaskList() {
             <Text 
               style={[
                 styles.taskTitle,
-                task.completed && styles.completedText
+                { color: colors.text.primary },
+                task.completed && { color: colors.text.secondary }
               ]}
               numberOfLines={1}
             >
               {task.title}
             </Text>
-            {task.description ? (
+            {task.description && (
               <Text 
-                style={styles.taskDescription}
+                style={[styles.taskDescription, { color: colors.text.secondary }]}
                 numberOfLines={1}
               >
                 {task.description}
               </Text>
-            ) : null}
-            {task.due_date ? (
+            )}
+            {task.due_date && (
               <View style={styles.dueDate}>
                 <MaterialIcons 
-                  name="access-time" 
-                  size={14} 
+                  name="event" 
+                  size={16} 
                   color={colors.text.secondary} 
                 />
-                <Text style={styles.dueDateText}>
+                <Text style={[styles.dueDateText, { color: colors.text.secondary }]}>
                   {formatDate(new Date(task.due_date))}
                 </Text>
               </View>
-            ) : null}
+            )}
           </View>
 
           <MaterialIcons 
@@ -97,23 +108,20 @@ export function TaskList() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background.default,
+    flex: 1,
   },
   emptyContainer: {
     padding: spacing.xl,
     alignItems: 'center',
-    backgroundColor: colors.background.secondary,
     borderRadius: 16,
   },
   emptyText: {
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
-    color: colors.text.primary,
     marginTop: spacing.md,
   },
   emptySubtext: {
     fontSize: typography.fontSize.md,
-    color: colors.text.secondary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -121,11 +129,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.md,
-    backgroundColor: colors.background.default,
     borderRadius: 12,
     marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   checkbox: {
     marginRight: spacing.md,
@@ -137,16 +143,10 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: '500',
-    color: colors.text.primary,
     marginBottom: 2,
-  },
-  completedText: {
-    textDecorationLine: 'line-through',
-    color: colors.text.secondary,
   },
   taskDescription: {
     fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
     marginBottom: spacing.xs,
   },
   dueDate: {
@@ -156,6 +156,5 @@ const styles = StyleSheet.create({
   },
   dueDateText: {
     fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
   },
 }); 

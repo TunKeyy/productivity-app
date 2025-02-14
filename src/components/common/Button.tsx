@@ -7,6 +7,7 @@ import {
   TextStyle 
 } from 'react-native';
 import { colors, typography } from '@/constants/theme';
+import { useTheme } from '@/providers/ThemeProvider';
 
 interface ButtonProps {
   onPress: () => void;
@@ -27,13 +28,28 @@ export function Button({
   textStyle,
   disabled = false,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  
+  const buttonColors = {
+    primary: colors.primary,
+    secondary: colors.secondary,
+    outline: 'transparent',
+  };
+
+  const textColors = {
+    primary: '#FFFFFF',
+    secondary: '#FFFFFF',
+    outline: colors.primary,
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
       style={[
         styles.button,
-        styles[variant],
+        { backgroundColor: buttonColors[variant] },
+        variant === 'outline' && { borderColor: colors.primary, borderWidth: 1 },
         styles[size],
         disabled && styles.disabled,
         style,
@@ -41,7 +57,7 @@ export function Button({
     >
       <Text style={[
         styles.text,
-        styles[`${variant}Text`],
+        { color: textColors[variant] },
         styles[`${size}Text`],
         disabled && styles.disabledText,
         textStyle,
@@ -106,6 +122,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   disabledText: {
-    color: colors.text.light,
+    color: '#9CA3AF',
   },
 }); 

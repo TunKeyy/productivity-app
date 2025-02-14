@@ -12,10 +12,12 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
 import { colors, typography, spacing } from '@/constants/theme';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function StatisticsScreen() {
+  const { colors, theme } = useTheme();
   // Modify data format for react-native-chart-kit
   const weeklyData = {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -32,10 +34,10 @@ export default function StatisticsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.default }]}>
+      <StatusBar barStyle={theme === 'dark' ? "light-content" : "dark-content"} />
       <View style={styles.header}>
-        <Text style={styles.title}>Statistics</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Statistics</Text>
       </View>
 
       <ScrollView 
@@ -45,8 +47,8 @@ export default function StatisticsScreen() {
         <View style={styles.summaryCards}>
           <View style={[styles.card, { backgroundColor: colors.accent }]}>
             <MaterialIcons name="check-circle" size={24} color={colors.primary} />
-            <Text style={styles.cardValue}>24</Text>
-            <Text style={styles.cardLabel}>Tasks Completed</Text>
+            <Text style={[styles.cardValue, { color: colors.text.primary }]}>24</Text>
+            <Text style={[styles.cardLabel, { color: colors.text.secondary }]}>Tasks Completed</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: '#F8E4FF' }]}>
@@ -57,11 +59,11 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weekly Progress</Text>
-          <View style={styles.chartContainer}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Weekly Progress</Text>
+          <View style={[styles.chartContainer, { backgroundColor: colors.background.default }]}>
             <LineChart
               data={weeklyData}
-              width={screenWidth - spacing.lg * 2}
+              width={screenWidth - 32}
               height={220}
               chartConfig={{
                 backgroundColor: colors.background.default,
@@ -69,15 +71,7 @@ export default function StatisticsScreen() {
                 backgroundGradientTo: colors.background.default,
                 decimalPlaces: 0,
                 color: () => colors.primary,
-                labelColor: () => colors.text.secondary,
-                style: {
-                  borderRadius: 16
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: colors.primary
-                }
+                style: { borderRadius: 16 },
               }}
               bezier
               style={styles.chart}
@@ -86,8 +80,8 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Monthly Overview</Text>
-          <View style={styles.chartContainer}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Monthly Overview</Text>
+          <View style={[styles.chartContainer, { backgroundColor: colors.background.default }]}>
             <LineChart
               data={monthlyData}
               width={screenWidth - spacing.lg * 2}
@@ -98,7 +92,6 @@ export default function StatisticsScreen() {
                 backgroundGradientTo: colors.background.default,
                 decimalPlaces: 0,
                 color: () => colors.primary,
-                labelColor: () => colors.text.secondary,
                 style: {
                   borderRadius: 16
                 },
@@ -115,12 +108,12 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Top Categories</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Top Categories</Text>
           {['Work', 'Personal', 'Study', 'Health'].map((category, index) => (
             <View key={category} style={styles.categoryItem}>
               <View style={styles.categoryInfo}>
-                <Text style={styles.categoryName}>{category}</Text>
-                <Text style={styles.categoryCount}>8 tasks</Text>
+                <Text style={[styles.categoryName, { color: colors.text.primary }]}>{category}</Text>
+                <Text style={[styles.categoryCount, { color: colors.text.secondary }]}>8 tasks</Text>
               </View>
               <View style={styles.progressBar}>
                 <View 
@@ -141,7 +134,6 @@ export default function StatisticsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
   },
   header: {
     paddingHorizontal: spacing.lg,
@@ -150,7 +142,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.xl,
     fontWeight: '600',
-    color: colors.text.primary,
   },
   content: {
     flex: 1,
@@ -168,14 +159,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardValue: {
-    fontSize: typography.fontSize.xxl,
+    fontSize: typography.fontSize['2xl'],
     fontWeight: '600',
-    color: colors.text.primary,
     marginVertical: spacing.xs,
   },
   cardLabel: {
     fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
   },
   section: {
     marginBottom: spacing.xl,
@@ -183,11 +172,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
-    color: colors.text.primary,
     marginBottom: spacing.md,
   },
   chartContainer: {
-    backgroundColor: colors.background.default,
     borderRadius: 16,
     padding: spacing.md,
     ...Platform.select({
@@ -216,20 +203,16 @@ const styles = StyleSheet.create({
   },
   categoryName: {
     fontSize: typography.fontSize.md,
-    color: colors.text.primary,
   },
   categoryCount: {
     fontSize: typography.fontSize.md,
-    color: colors.text.secondary,
   },
   progressBar: {
     height: 8,
-    backgroundColor: colors.background.secondary,
     borderRadius: 4,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
     borderRadius: 4,
   },
 }); 

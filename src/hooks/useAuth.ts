@@ -11,7 +11,7 @@ export function useAuth() {
         email,
         password,
       });
-
+      
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -43,10 +43,23 @@ export function useAuth() {
     }
   }, []);
 
+  const signIn = async ({ email, password }: { email: string; password: string }) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) throw error;
+    
+    // This should trigger the redirect in index.tsx
+    return data;
+  };
+
   return {
     ...state,
     login,
     register,
     logout,
+    signIn,
   };
 } 

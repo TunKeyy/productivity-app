@@ -14,23 +14,42 @@ import { useAuth } from '@/hooks/useAuth';
 import { TaskList } from '@/components/tasks/TaskList';
 import { colors, typography, spacing } from '@/constants/theme';
 import { formatDate } from '@/utils/date';
+import { useTheme } from '@/providers/ThemeProvider';
+import { Navigation } from '@/navigation/Nagivation';
 
 export default function HomeScreen() {
+  const { colors, theme, toggleTheme } = useTheme();
   const { user } = useAuth();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.default }]}>
+      <StatusBar barStyle={theme === 'dark' ? "light-content" : "dark-content"} />
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>
+          <Text style={[styles.greeting, { color: colors.text.primary }]}>
             Hello, {user?.email?.split('@')[0]}
           </Text>
-          <Text style={styles.date}>{formatDate(new Date())}</Text>
+          <Text style={[styles.date, { color: colors.text.secondary }]}>
+            {formatDate(new Date())}
+          </Text>
         </View>
-        <TouchableOpacity style={styles.profileButton}>
-          <MaterialIcons name="person" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity 
+            style={[styles.iconButton, { backgroundColor: colors.background.secondary }]}
+            onPress={toggleTheme}
+          >
+            <MaterialIcons 
+              name={theme === 'dark' ? "light-mode" : "dark-mode"} 
+              size={24} 
+              color={colors.text.primary} 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.iconButton, { backgroundColor: colors.background.secondary }]}
+          >
+            <MaterialIcons name="person" size={24} color={colors.text.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView 
@@ -82,7 +101,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
   },
   header: {
     flexDirection: 'row',
@@ -95,18 +113,18 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: typography.fontSize.xl,
     fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 4,
   },
   date: {
     fontSize: typography.fontSize.md,
-    color: colors.text.secondary,
   },
-  profileButton: {
+  headerButtons: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -129,7 +147,6 @@ const styles = StyleSheet.create({
   quickActionText: {
     fontSize: typography.fontSize.sm,
     fontWeight: '500',
-    color: colors.text.primary,
   },
   section: {
     marginBottom: spacing.xl,
@@ -143,6 +160,5 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
-    color: colors.text.primary,
   },
 }); 

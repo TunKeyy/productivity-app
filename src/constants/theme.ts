@@ -1,22 +1,54 @@
+import { useColorScheme } from 'react-native';
+
 export const colors = {
-  primary: '#7B66FF',
-  secondary: '#C5B6FF',
-  accent: '#F2F1F9',
-  text: {
-    primary: '#1A1A1A',
-    secondary: '#666666',
-    light: '#999999',
+  primary: '#7C3AED', // Purple
+  secondary: '#60A5FA', // Blue
+  accent: {
+    light: '#F2F1F9',
+    dark: '#2D2B42'
   },
   background: {
-    default: '#FFFFFF',
-    secondary: '#F8F8F8',
-    accent: '#F2F1F9',
+    light: {
+      default: '#FFFFFF',
+      secondary: '#F3F4F6',
+    },
+    dark: {
+      default: '#1F2937',
+      secondary: '#374151',
+    }
   },
-  border: '#E5E5E5',
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FFC107',
-  info: '#2196F3',
+  text: {
+    light: {
+      primary: '#1F2937',
+      secondary: '#6B7280',
+      light: '#9CA3AF',
+    },
+    dark: {
+      primary: '#F9FAFB',
+      secondary: '#D1D5DB',
+      light: '#9CA3AF',
+    }
+  },
+  border: {
+    light: '#E5E7EB',
+    dark: '#374151',
+  },
+  success: {
+    light: '#4CAF50',
+    dark: '#2E7D32'
+  },
+  error: {
+    light: '#F44336',
+    dark: '#C62828'
+  },
+  warning: {
+    light: '#FFC107',
+    dark: '#F57F17'
+  },
+  info: {
+    light: '#2196F3',
+    dark: '#1565C0'
+  }
 };
 
 export const typography = {
@@ -31,7 +63,7 @@ export const typography = {
     md: 16,
     lg: 18,
     xl: 20,
-    xxl: 24,
+    '2xl': 24,
   },
   lineHeight: {
     tight: 1.2,
@@ -46,7 +78,7 @@ export const spacing = {
   md: 16,
   lg: 24,
   xl: 32,
-  xxl: 48,
+  '2xl': 48,
 };
 
 export const borderRadius = {

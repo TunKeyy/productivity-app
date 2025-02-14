@@ -1,82 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   StyleSheet, 
-  ScrollView, 
   Text,
   TextInput,
   TouchableOpacity,
   ActivityIndicator 
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { router } from 'expo-router';
 import { useTasks } from '@/hooks/useTasks';
-import { formatDate, formatTime } from '@/utils/date';
-import { RecurringPatternConfig } from '@/components/tasks/RecurringPatternConfig';
-import { RecurringPattern } from '@/types/database';
-
-const PRIORITIES = [
-  { label: 'Low', value: 1 },
-  { label: 'Medium', value: 2 },
-  { label: 'High', value: 3 },
-];
-
-interface DateTimePickerEvent {
-  type: string;
-  nativeEvent: {
-    timestamp?: number;
-  };
-}
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function NewTaskScreen() {
-  const { date: preSelectedDate } = useLocalSearchParams<{ date?: string }>();
-  const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [dueDate, setDueDate] = React.useState<Date | null>(
-    preSelectedDate ? new Date(preSelectedDate) : null
-  );
-  const [showDatePicker, setShowDatePicker] = React.useState(false);
-  const [showTimePicker, setShowTimePicker] = React.useState(false);
-  const [priority, setPriority] = React.useState(1);
-  const [tag, setTag] = React.useState('');
-  const [tags, setTags] = React.useState<string[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState('');
-  const [recurringPattern, setRecurringPattern] = React.useState<RecurringPattern>();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const { addTask } = useTasks();
-
-  const handleAddTag = () => {
-    if (tag.trim() && !tags.includes(tag.trim())) {
-      setTags([...tags, tag.trim()]);
-      setTag('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((t: string) => t !== tagToRemove));
-  };
-
-  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      const newDate = dueDate ? new Date(dueDate) : new Date();
-      newDate.setFullYear(selectedDate.getFullYear());
-      newDate.setMonth(selectedDate.getMonth());
-      newDate.setDate(selectedDate.getDate());
-      setDueDate(newDate);
-    }
-  };
-
-  const handleTimeChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
-    setShowTimePicker(false);
-    if (selectedTime) {
-      const newDate = dueDate ? new Date(dueDate) : new Date();
-      newDate.setHours(selectedTime.getHours());
-      newDate.setMinutes(selectedTime.getMinutes());
-      setDueDate(newDate);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -88,16 +32,14 @@ export default function NewTaskScreen() {
     setError('');
 
     try {
-      const { error } = await addTask({
+      await addTask({
         title: title.trim(),
         description: description.trim(),
         due_date: dueDate?.toISOString(),
-        priority,
-        tags,
-        recurring_pattern: recurringPattern,
+        completed: false,
+        priority: 0,
       });
 
-      if (error) throw error;
       router.back();
     } catch (err) {
       setError((err as Error).message);
@@ -107,7 +49,7 @@ export default function NewTaskScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>New Task</Text>
 
       <TextInput
@@ -119,11 +61,11 @@ export default function NewTaskScreen() {
 
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Description (optional)"
+        placeholder="Description"
         value={description}
         onChangeText={setDescription}
         multiline
-        numberOfLines={4}
+        numberOfLines={3}
       />
 
       <View style={styles.dateSection}>
@@ -134,15 +76,16 @@ export default function NewTaskScreen() {
             onPress={() => setShowDatePicker(true)}
           >
             <Text style={styles.dateButtonText}>
-              {dueDate ? formatDate(dueDate) : 'Select Date'}
+              {dueDate ? dueDate.toLocaleDateString() : 'Select Date'}
             </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowTimePicker(true)}
           >
             <Text style={styles.dateButtonText}>
-              {dueDate ? formatTime(dueDate) : 'Select Time'}
+              {dueDate ? dueDate.toLocaleTimeString() : 'Select Time'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -152,7 +95,16 @@ export default function NewTaskScreen() {
         <DateTimePicker
           value={dueDate || new Date()}
           mode="date"
-          onChange={handleDateChange}
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              const newDate = dueDate ? new Date(dueDate) : new Date();
+              newDate.setFullYear(selectedDate.getFullYear());
+              newDate.setMonth(selectedDate.getMonth());
+              newDate.setDate(selectedDate.getDate());
+              setDueDate(newDate);
+            }
+          }}
         />
       )}
 
@@ -160,74 +112,19 @@ export default function NewTaskScreen() {
         <DateTimePicker
           value={dueDate || new Date()}
           mode="time"
-          onChange={handleTimeChange}
+          onChange={(event, selectedDate) => {
+            setShowTimePicker(false);
+            if (selectedDate) {
+              const newDate = dueDate ? new Date(dueDate) : new Date();
+              newDate.setHours(selectedDate.getHours());
+              newDate.setMinutes(selectedDate.getMinutes());
+              setDueDate(newDate);
+            }
+          }}
         />
       )}
 
-      <View style={styles.prioritySection}>
-        <Text style={styles.sectionTitle}>Priority</Text>
-        <View style={styles.priorities}>
-          {PRIORITIES.map(p => (
-            <TouchableOpacity
-              key={p.value}
-              style={[
-                styles.priorityChip,
-                priority === p.value && styles.selectedPriorityChip
-              ]}
-              onPress={() => setPriority(p.value)}
-            >
-              <Text style={[
-                styles.priorityText,
-                priority === p.value && styles.selectedPriorityText
-              ]}>
-                {p.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.tagsSection}>
-        <Text style={styles.sectionTitle}>Tags</Text>
-        <View style={styles.tagInput}>
-          <TextInput
-            style={styles.tagTextInput}
-            placeholder="Add a tag..."
-            value={tag}
-            onChangeText={setTag}
-          />
-          <TouchableOpacity 
-            style={styles.addTagButton}
-            onPress={handleAddTag}
-          >
-            <Text style={styles.addTagButtonText}>Add</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.tags}>
-          {tags.map(t => (
-            <TouchableOpacity
-              key={t}
-              style={styles.tag}
-              onPress={() => handleRemoveTag(t)}
-            >
-              <Text style={styles.tagText}>{t}</Text>
-              <Text style={styles.removeTag}>×</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.recurringSection}>
-        <Text style={styles.sectionTitle}>Recurring</Text>
-        <RecurringPatternConfig
-          value={recurringPattern}
-          onChange={setRecurringPattern}
-        />
-      </View>
-
-      {error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
         style={styles.submitButton}
@@ -240,7 +137,7 @@ export default function NewTaskScreen() {
           <Text style={styles.submitButtonText}>Create Task</Text>
         )}
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -254,6 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     marginBottom: 24,
+    color: '#000',
   },
   input: {
     height: 48,
@@ -277,6 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
+    color: '#000',
   },
   dateButtons: {
     flexDirection: 'row',
@@ -294,77 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  prioritySection: {
-    marginBottom: 24,
-  },
-  priorities: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  priorityChip: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-  },
-  selectedPriorityChip: {
-    backgroundColor: '#2196F3',
-  },
-  priorityText: {
-    color: '#666',
-    fontSize: 16,
-  },
-  selectedPriorityText: {
-    color: '#fff',
-  },
-  tagsSection: {
-    marginBottom: 24,
-  },
-  tagInput: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  tagTextInput: {
-    flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-  },
-  addTagButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    borderRadius: 8,
-  },
-  addTagButtonText: {
-    color: '#fff',
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  tagText: {
-    color: '#666',
-    marginRight: 4,
-  },
-  removeTag: {
-    color: '#666',
-    fontSize: 18,
-  },
   error: {
     color: '#B00020',
     marginBottom: 16,
@@ -374,15 +202,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     padding: 16,
     alignItems: 'center',
-    marginVertical: 16,
+    marginTop: 8,
     borderRadius: 8,
   },
   submitButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  recurringSection: {
-    marginBottom: 24,
   },
 }); 

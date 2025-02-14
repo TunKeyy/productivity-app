@@ -13,8 +13,10 @@ import { Calendar as RNCalendar } from 'react-native-calendars';
 import { colors, typography, spacing } from '@/constants/theme';
 import { Task } from '@/types/database';
 import { DayObject } from '@/types/calendar';
+import { useTheme } from '@/providers/ThemeProvider';
 
 export default function CalendarScreen() {
+  const { colors, theme } = useTheme();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   
   // Placeholder data - replace with your actual data fetching logic
@@ -28,23 +30,30 @@ export default function CalendarScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <Text style={styles.title}>Calendar</Text>
-        <TouchableOpacity style={styles.todayButton}>
-          <Text style={styles.todayButtonText}>Today</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.default }]}>
+      <StatusBar barStyle={theme === 'dark' ? "light-content" : "dark-content"} />
+      <View style={[styles.header, { 
+        backgroundColor: colors.background.default,
+        borderBottomColor: colors.border 
+      }]}>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Calendar</Text>
+        <TouchableOpacity 
+          style={[styles.todayButton, { backgroundColor: colors.background.secondary }]}
+        >
+          <Text style={[styles.todayButtonText, { color: colors.primary }]}>
+            Today
+          </Text>
         </TouchableOpacity>
       </View>
 
       <RNCalendar
-        style={styles.calendar}
+        style={[styles.calendar, { borderBottomColor: colors.border }]}
         theme={{
           backgroundColor: colors.background.default,
           calendarBackground: colors.background.default,
           textSectionTitleColor: colors.text.secondary,
           selectedDayBackgroundColor: colors.primary,
-          selectedDayTextColor: '#ffffff',
+          selectedDayTextColor: '#FFFFFF',
           todayTextColor: colors.primary,
           dayTextColor: colors.text.primary,
           textDisabledColor: colors.text.light,
@@ -60,26 +69,31 @@ export default function CalendarScreen() {
         enableSwipeMonths
       />
 
-      <View style={styles.taskSection}>
-        <Text style={styles.sectionTitle}>Schedule</Text>
+      <View style={[styles.taskSection, { borderTopColor: colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Schedule</Text>
         <ScrollView style={styles.taskList}>
           {tasks.length === 0 ? (
-            <View style={styles.emptyState}>
+            <View style={[styles.emptyState, { backgroundColor: colors.background.secondary }]}>
               <MaterialIcons 
                 name="event-available" 
                 size={48} 
                 color={colors.secondary}
               />
-              <Text style={styles.emptyStateText}>No tasks scheduled</Text>
-              <Text style={styles.emptyStateSubtext}>
+              <Text style={[styles.emptyStateText, { color: colors.text.primary }]}>
+                No tasks scheduled
+              </Text>
+              <Text style={[styles.emptyStateSubtext, { color: colors.text.secondary }]}>
                 Tap + to add a new task
               </Text>
             </View>
           ) : (
             tasks.map(task => (
-              <View key={task.id} style={styles.taskItem}>
+              <View 
+                key={task.id} 
+                style={[styles.taskItem, { backgroundColor: colors.background.secondary }]}
+              >
                 <View style={styles.taskTime}>
-                  <Text style={styles.timeText}>
+                  <Text style={[styles.timeText, { color: colors.text.secondary }]}>
                     {new Date(task.due_date!).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -87,9 +101,14 @@ export default function CalendarScreen() {
                   </Text>
                 </View>
                 <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>{task.title}</Text>
+                  <Text style={[styles.taskTitle, { color: colors.text.primary }]}>
+                    {task.title}
+                  </Text>
                   {task.description && (
-                    <Text style={styles.taskDescription} numberOfLines={1}>
+                    <Text 
+                      style={[styles.taskDescription, { color: colors.text.secondary }]} 
+                      numberOfLines={1}
+                    >
                       {task.description}
                     </Text>
                   )}
@@ -100,7 +119,7 @@ export default function CalendarScreen() {
         </ScrollView>
       </View>
 
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]}>
         <MaterialIcons name="add" size={24} color="#FFFFFF" />
       </TouchableOpacity>
     </SafeAreaView>
@@ -110,7 +129,6 @@ export default function CalendarScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.default,
   },
   header: {
     flexDirection: 'row',
@@ -118,35 +136,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    borderBottomWidth: 1,
   },
   title: {
     fontSize: typography.fontSize.xl,
     fontWeight: '600',
-    color: colors.text.primary,
   },
   todayButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.background.secondary,
     borderRadius: 20,
   },
   todayButtonText: {
-    color: colors.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: '500',
   },
   calendar: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   taskSection: {
     flex: 1,
     padding: spacing.lg,
+    borderTopWidth: 1,
   },
   sectionTitle: {
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
-    color: colors.text.primary,
     marginBottom: spacing.md,
   },
   taskList: {
@@ -161,18 +176,15 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
-    color: colors.text.primary,
     marginTop: spacing.md,
   },
   emptyStateSubtext: {
     fontSize: typography.fontSize.md,
-    color: colors.text.secondary,
     marginTop: spacing.xs,
   },
   taskItem: {
     flexDirection: 'row',
     padding: spacing.md,
-    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     marginBottom: spacing.sm,
   },
@@ -182,7 +194,6 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
     fontWeight: '500',
   },
   taskContent: {
@@ -191,12 +202,10 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: '500',
-    color: colors.text.primary,
     marginBottom: 2,
   },
   taskDescription: {
     fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
   },
   fab: {
     position: 'absolute',
@@ -205,7 +214,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
